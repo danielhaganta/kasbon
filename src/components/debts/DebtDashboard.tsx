@@ -100,7 +100,7 @@ export function DebtDashboard() {
 
   return (
     <>
-      <main className="mx-auto w-full max-w-2xl flex-1 px-4 pb-28 pt-5 sm:pb-12">
+      <main className="mx-auto w-full max-w-2xl flex-1 px-4 pt-5 pb-[calc(3.5rem+2.5rem+env(safe-area-inset-bottom))] sm:pb-12">
         {summary ? <SummaryCards summary={summary} /> : !error && <SummaryCardsSkeleton />}
 
         <section aria-labelledby="debt-list-title" className="mt-8">

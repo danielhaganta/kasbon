@@ -119,14 +119,15 @@ function FilterSelect<T extends string>({
   return (
     <label className={`flex min-w-0 flex-col gap-1 ${className}`}>
       <span className="text-xs font-medium text-stone-500">{label}</span>
-      <span className="relative">
+      {/* block + w-full so the absolute chevron anchors to the select's right edge, not the text. */}
+      <span className="relative block w-full">
         <select
           value={value}
           onChange={(event) => {
             const option = options.find((o) => o.value === event.target.value);
             if (option) onChange(option.value);
           }}
-          className="h-11 w-full cursor-pointer appearance-none truncate rounded-xl border border-stone-200 bg-white pl-3 pr-8 text-base font-medium text-stone-800 shadow-sm outline-none transition hover:border-stone-300 focus:border-emerald-600 focus:ring-4 focus:ring-emerald-600/15 sm:text-sm"
+          className="block h-11 w-full cursor-pointer appearance-none rounded-xl border border-stone-200 bg-white pl-3.5 pr-10 text-base font-medium text-stone-800 shadow-sm outline-none transition hover:border-stone-300 focus:border-emerald-600 focus:ring-4 focus:ring-emerald-600/15 sm:text-sm"
         >
           {options.map((option) => (
             <option key={option.value} value={option.value}>
@@ -135,7 +136,7 @@ function FilterSelect<T extends string>({
           ))}
         </select>
         <ChevronDown
-          className="pointer-events-none absolute right-2.5 top-1/2 size-4 -translate-y-1/2 text-stone-400"
+          className="pointer-events-none absolute right-3.5 top-1/2 size-4 -translate-y-1/2 text-stone-400"
           aria-hidden
         />
       </span>
