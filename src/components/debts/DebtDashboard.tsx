@@ -5,8 +5,9 @@ import { useState } from "react";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { Toaster, useToasts } from "@/components/ui/Toast";
 import { useDebts, type Debt } from "@/hooks/useDebts";
-import type { DebtQuery } from "@/lib/validations/debt";
+import type { DebtInput, DebtQuery } from "@/lib/validations/debt";
 import { DebtFilters } from "./DebtFilters";
+import { DebtFormModal } from "./DebtFormModal";
 import type { DebtAction } from "./DebtItem";
 import { DebtList } from "./DebtList";
 import { SummaryCards, SummaryCardsSkeleton } from "./SummaryCards";
@@ -18,13 +19,22 @@ type FormTarget = "new" | Debt | null;
 
 export function DebtDashboard() {
   const [filters, setFilters] = useState<DebtQuery>(DEFAULT_FILTERS);
-  const { debts, summary, isLoading, error, refetch, toggleSettled, deleteDebt, pendingIds } =
-    useDebts(filters);
+  const {
+    debts,
+    summary,
+    isLoading,
+    error,
+    refetch,
+    createDebt,
+    updateDebt,
+    toggleSettled,
+    deleteDebt,
+    pendingIds,
+  } = useDebts(filters);
   const { toasts, showToast, dismissToast } = useToasts();
   const [busyActions, setBusyActions] = useState<Partial<Record<string, DebtAction>>>({});
   const [deleteTarget, setDeleteTarget] = useState<Debt | null>(null);
-  // DebtForm (next step) will open from this state.
-  const [, setFormTarget] = useState<FormTarget>(null);
+  const [formTarget, setFormTarget] = useState<FormTarget>(null);
 
   const isFiltered = filters.status !== "all" || filters.type !== "all";
 
@@ -53,6 +63,13 @@ export function DebtDashboard() {
       () => toggleSettled(debt),
       settling ? "Sip, udah ditandai lunas" : "Oke, status lunasnya dibatalin",
     );
+  }
+
+  async function handleSave(input: DebtInput) {
+    if (formTarget === "new") await createDebt(input);
+    else if (formTarget) await updateDebt(formTarget.id, input);
+    setFormTarget(null);
+    showToast("success", "Catatan tersimpan");
   }
 
   function handleConfirmDelete() {
@@ -104,6 +121,14 @@ export function DebtDashboard() {
         </section>
       </main>
 
+      {formTarget && (
+        <DebtFormModal
+          key={formTarget === "new" ? "new" : formTarget.id}
+          debt={formTarget === "new" ? undefined : formTarget}
+          onSave={handleSave}
+          onClose={() => setFormTarget(null)}
+        />
+      )}
       <ConfirmDialog
         open={deleteTarget !== null}
         title="Yakin mau hapus catatan ini?"
