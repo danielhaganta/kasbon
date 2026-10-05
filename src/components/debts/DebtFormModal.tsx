@@ -267,7 +267,7 @@ export function DebtFormModal({ debt, onSave, onClose }: DebtFormModalProps) {
             className="flex h-12 flex-1 items-center justify-center gap-2 rounded-xl bg-emerald-700 px-6 font-semibold text-white transition hover:bg-emerald-800 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70 sm:h-11 sm:flex-none"
           >
             {isSubmitting && <Loader2 className="size-5 animate-spin" aria-hidden />}
-            {isSubmitting ? "Menyimpan..." : "Simpan"}
+            {isSubmitting ? "Lagi nyimpan..." : "Simpan"}
           </button>
         </div>
       </form>

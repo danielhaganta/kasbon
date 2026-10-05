@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export const MAX_AMOUNT = 1_000_000_000_000;
 
-export const debtTypeSchema = z.enum(["owed_to_me", "i_owe"], "Jenis catatannya nggak valid");
+export const debtTypeSchema = z.enum(["owed_to_me", "i_owe"], "Tipe catatannya nggak valid");
 
 export const debtInputSchema = z.object({
   type: debtTypeSchema,
@@ -36,7 +36,7 @@ export const debtQuerySchema = z.object({
   status: z
     .enum(["all", "unsettled", "settled"], "Filter status nggak valid")
     .default("all"),
-  type: z.enum(["all", "owed_to_me", "i_owe"], "Filter jenis nggak valid").default("all"),
+  type: z.enum(["all", "owed_to_me", "i_owe"], "Filter tipe nggak valid").default("all"),
 });
 
 export type DebtType = z.infer<typeof debtTypeSchema>;

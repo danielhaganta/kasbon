@@ -27,25 +27,15 @@ export async function GET(request: NextRequest) {
   if (filters.status === "settled") listQuery = listQuery.not("settled_at", "is", null);
   if (filters.type !== "all") listQuery = listQuery.eq("type", filters.type);
 
-  // Summary ignores filters: always every unsettled debt of this user.
-  // ponytail: sums in JS, capped by PostgREST max-rows (1000 default); move to a SQL view/RPC if users exceed that.
-  const [list, unsettled] = await Promise.all([
+  // Summary ignores filters: summed in SQL over every unsettled debt the caller's RLS allows.
+  const [list, summary] = await Promise.all([
     listQuery,
-    supabase
-      .from("debts")
-      .select("type, amount")
-      .eq("user_id", user.id)
-      .is("settled_at", null),
+    supabase.rpc("get_debt_summary").single(),
   ]);
   if (list.error) return serverError("GET /api/debts list", list.error);
-  if (unsettled.error) return serverError("GET /api/debts summary", unsettled.error);
+  if (summary.error) return serverError("GET /api/debts summary", summary.error);
 
-  let owedToMe = 0;
-  let iOwe = 0;
-  for (const debt of unsettled.data) {
-    if (debt.type === "owed_to_me") owedToMe += debt.amount;
-    else iOwe += debt.amount;
-  }
+  const { owed_to_me: owedToMe, i_owe: iOwe } = summary.data;
 
   return Response.json({
     data: list.data,

@@ -14,9 +14,9 @@ const credentialsSchema = z.object({
   password: z.string().min(6, "Password minimal 6 karakter ya"),
 });
 
-const EMAIL_TAKEN = "Email ini udah terdaftar, coba login aja";
+const EMAIL_TAKEN = "Email ini udah terdaftar, coba masuk aja";
 const RATE_LIMITED = "Kebanyakan percobaan nih, tunggu bentar ya";
-const GENERIC_ERROR = "Lagi ada gangguan nih, coba lagi bentar ya";
+const GENERIC_ERROR = "Ada masalah di server, coba lagi ya";
 
 const ERROR_MESSAGES: Record<string, string> = {
   invalid_credentials: "Email atau password salah nih",
@@ -75,7 +75,7 @@ export async function signup(
 
   if (!data.session) {
     return {
-      message: "Akun udah dibuat! Cek email kamu buat konfirmasi, abis itu login ya",
+      message: "Akun udah dibuat! Cek email kamu buat konfirmasi, abis itu masuk ya",
       email,
     };
   }

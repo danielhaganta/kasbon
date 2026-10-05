@@ -58,7 +58,13 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_debt_summary: {
+        Args: never
+        Returns: {
+          i_owe: number
+          owed_to_me: number
+        }[]
+      }
     }
     Enums: {
       debt_type: "owed_to_me" | "i_owe"
