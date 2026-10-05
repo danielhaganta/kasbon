@@ -134,7 +134,7 @@ export function DebtFormModal({ debt, onSave, onClose }: DebtFormModalProps) {
             type="button"
             onClick={requestClose}
             aria-label="Tutup"
-            className="grid size-10 place-items-center rounded-full text-stone-500 transition hover:bg-stone-100 hover:text-stone-900 active:scale-95"
+            className="-mr-2 grid size-11 shrink-0 place-items-center rounded-full text-stone-500 transition hover:bg-stone-100 hover:text-stone-900 active:scale-95"
           >
             <X className="size-5" aria-hidden />
           </button>
@@ -147,7 +147,7 @@ export function DebtFormModal({ debt, onSave, onClose }: DebtFormModalProps) {
               {TYPE_OPTIONS.map((option) => (
                 <label
                   key={option.value}
-                  className="relative flex h-10 cursor-pointer items-center justify-center rounded-lg text-sm font-medium text-stone-600 transition has-checked:bg-white has-checked:text-stone-900 has-checked:shadow-sm has-focus-visible:ring-2 has-focus-visible:ring-emerald-600/40 hover:text-stone-900"
+                  className="relative flex h-11 cursor-pointer items-center justify-center rounded-lg text-sm font-medium text-stone-600 transition has-checked:bg-white has-checked:text-stone-900 has-checked:shadow-sm has-focus-visible:ring-2 has-focus-visible:ring-emerald-600/40 hover:text-stone-900"
                 >
                   <input
                     ref={values.type === option.value ? firstFieldRef : undefined}

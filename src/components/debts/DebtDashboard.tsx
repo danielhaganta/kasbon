@@ -1,18 +1,22 @@
 "use client";
 
 import { Loader2, Plus, RotateCw, TriangleAlert } from "lucide-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { Toaster, useToasts } from "@/components/ui/Toast";
+import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import { useDebts, type Debt } from "@/hooks/useDebts";
+import { searchDebts, sortDebts, type SortOption } from "@/lib/debts";
 import type { DebtInput, DebtQuery } from "@/lib/validations/debt";
 import { DebtFilters } from "./DebtFilters";
 import { DebtFormModal } from "./DebtFormModal";
 import type { DebtAction } from "./DebtItem";
 import { DebtList } from "./DebtList";
 import { SummaryCards, SummaryCardsSkeleton } from "./SummaryCards";
+import { ViewToggle, type DebtView } from "./ViewToggle";
 
 const DEFAULT_FILTERS: DebtQuery = { status: "all", type: "all" };
+const SEARCH_DEBOUNCE_MS = 200;
 
 /** null = closed, "new" = create form, Debt = edit form. */
 type FormTarget = "new" | Debt | null;
@@ -35,8 +39,24 @@ export function DebtDashboard() {
   const [busyActions, setBusyActions] = useState<Partial<Record<string, DebtAction>>>({});
   const [deleteTarget, setDeleteTarget] = useState<Debt | null>(null);
   const [formTarget, setFormTarget] = useState<FormTarget>(null);
+  const [search, setSearch] = useState("");
+  const [sort, setSort] = useState<SortOption>("newest");
+  const [view, setView] = useState<DebtView>("entry");
+  const debouncedSearch = useDebouncedValue(search, SEARCH_DEBOUNCE_MS);
 
-  const isFiltered = filters.status !== "all" || filters.type !== "all";
+  // Search and sort run on the fetched list; status/type filtering stays on the server.
+  const visibleDebts = useMemo(
+    () => sortDebts(searchDebts(debts, debouncedSearch), sort),
+    [debts, debouncedSearch, sort],
+  );
+
+  const isFiltered =
+    filters.status !== "all" || filters.type !== "all" || debouncedSearch.trim() !== "";
+
+  function resetFilters() {
+    setFilters(DEFAULT_FILTERS);
+    setSearch("");
+  }
 
   async function runAction(
     debt: Debt,
@@ -84,28 +104,39 @@ export function DebtDashboard() {
         {summary ? <SummaryCards summary={summary} /> : !error && <SummaryCardsSkeleton />}
 
         <section aria-labelledby="debt-list-title" className="mt-8">
-          <div className="mb-3 flex items-center justify-between gap-3">
+          <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
             <h2 id="debt-list-title" className="text-lg font-semibold text-stone-900">
               Catatan
             </h2>
-            <button
-              type="button"
-              onClick={() => setFormTarget("new")}
-              className="fixed bottom-[max(1.25rem,env(safe-area-inset-bottom))] right-4 z-30 inline-flex h-14 items-center gap-2 rounded-full bg-emerald-700 pl-5 pr-6 font-semibold text-white shadow-lg shadow-emerald-900/25 transition hover:bg-emerald-800 active:scale-95 sm:static sm:h-10 sm:rounded-xl sm:pl-3 sm:pr-4 sm:text-sm sm:shadow-sm"
-            >
-              <Plus className="size-5 sm:size-4" aria-hidden />
-              Catat baru
-            </button>
+            <div className="flex items-center gap-2">
+              <ViewToggle value={view} onChange={setView} />
+              <button
+                type="button"
+                onClick={() => setFormTarget("new")}
+                className="fixed bottom-[max(1.25rem,env(safe-area-inset-bottom))] right-4 z-30 inline-flex h-14 items-center gap-2 rounded-full bg-emerald-700 pl-5 pr-6 font-semibold text-white shadow-lg shadow-emerald-900/25 transition hover:bg-emerald-800 active:scale-95 sm:static sm:h-11 sm:rounded-xl sm:pl-3 sm:pr-4 sm:text-sm sm:shadow-sm"
+              >
+                <Plus className="size-5 sm:size-4" aria-hidden />
+                Catat baru
+              </button>
+            </div>
           </div>
 
-          <DebtFilters value={filters} onChange={setFilters} />
+          <DebtFilters
+            filters={filters}
+            onFiltersChange={setFilters}
+            search={search}
+            onSearchChange={setSearch}
+            sort={sort}
+            onSortChange={setSort}
+          />
 
           <div className="mt-4">
             {error && !isLoading ? (
               <ErrorState message={error} onRetry={refetch} />
             ) : (
               <DebtList
-                debts={debts}
+                debts={visibleDebts}
+                view={view}
                 isLoading={isLoading}
                 isFiltered={isFiltered}
                 pendingIds={pendingIds}
@@ -113,7 +144,7 @@ export function DebtDashboard() {
                 onToggleSettled={handleToggleSettled}
                 onEdit={setFormTarget}
                 onDelete={setDeleteTarget}
-                onResetFilters={() => setFilters(DEFAULT_FILTERS)}
+                onResetFilters={resetFilters}
                 onCreate={() => setFormTarget("new")}
               />
             )}
@@ -166,7 +197,7 @@ function ErrorState({ message, onRetry }: { message: string; onRetry: () => Prom
         type="button"
         onClick={retry}
         disabled={isRetrying}
-        className="mt-5 inline-flex h-10 items-center gap-1.5 rounded-xl bg-white px-4 text-sm font-semibold text-rose-700 shadow-sm ring-1 ring-rose-200 transition hover:bg-rose-100 active:scale-[0.97] disabled:opacity-60"
+        className="mt-5 inline-flex h-11 items-center gap-1.5 rounded-xl bg-white px-4 text-sm font-semibold text-rose-700 shadow-sm ring-1 ring-rose-200 transition hover:bg-rose-100 active:scale-[0.97] disabled:opacity-60"
       >
         {isRetrying ? (
           <Loader2 className="size-4 animate-spin" aria-hidden />

@@ -52,12 +52,12 @@ export function Toaster({ toasts, onDismiss }: ToasterProps) {
               className={`size-5 shrink-0 ${toast.kind === "success" ? "text-emerald-400" : "text-rose-400"}`}
               aria-hidden
             />
-            <p className="flex-1">{toast.message}</p>
+            <p className="min-w-0 flex-1 [overflow-wrap:anywhere]">{toast.message}</p>
             <button
               type="button"
               onClick={() => onDismiss(toast.id)}
               aria-label="Tutup notifikasi"
-              className="grid size-8 shrink-0 place-items-center rounded-full text-stone-400 transition hover:bg-white/10 hover:text-white"
+              className="-my-1 grid size-11 shrink-0 place-items-center rounded-full text-stone-400 transition hover:bg-white/10 hover:text-white"
             >
               <X className="size-4" aria-hidden />
             </button>

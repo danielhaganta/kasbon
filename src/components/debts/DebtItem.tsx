@@ -49,7 +49,9 @@ export function DebtItem({
     >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="truncate font-semibold text-stone-900">{debt.counterpart_name}</p>
+          <p className="truncate font-semibold text-stone-900" title={debt.counterpart_name}>
+            {debt.counterpart_name}
+          </p>
           <div className="mt-1.5 flex flex-wrap gap-1.5">
             <Badge className={TYPE_BADGE[debt.type]}>{DEBT_TYPE_LABELS[debt.type]}</Badge>
             {isSettled ? (
@@ -79,7 +81,7 @@ export function DebtItem({
         </p>
       )}
 
-      <div className="mt-4 flex gap-2 border-t border-stone-100 pt-3">
+      <div className="mt-4 flex flex-wrap gap-2 border-t border-stone-100 pt-3">
         <ActionButton
           icon={isSettled ? Undo2 : CircleCheck}
           label={isSettled ? "Batalin lunas" : "Tandai lunas"}
@@ -162,7 +164,7 @@ function ActionButton({ icon: Icon, label, tone, disabled, loading, onClick }: A
       onClick={onClick}
       disabled={disabled}
       aria-busy={loading}
-      className={`flex h-10 flex-1 items-center justify-center gap-1.5 rounded-xl px-3 text-sm font-medium whitespace-nowrap transition active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-60 disabled:active:scale-100 sm:flex-none ${BUTTON_TONES[tone]}`}
+      className={`flex h-11 flex-1 basis-auto items-center justify-center gap-1.5 rounded-xl px-3 text-sm font-medium whitespace-nowrap transition active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-60 disabled:active:scale-100 sm:flex-none ${BUTTON_TONES[tone]}`}
     >
       <ShownIcon className={`size-4 ${loading ? "animate-spin" : ""}`} aria-hidden />
       {label}

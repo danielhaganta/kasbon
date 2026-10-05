@@ -1,6 +1,7 @@
 "use client";
 
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Search, X } from "lucide-react";
+import type { SortOption } from "@/lib/debts";
 import type { DebtQuery } from "@/lib/validations/debt";
 import { DEBT_TYPE_LABELS } from "./labels";
 
@@ -18,26 +19,84 @@ const TYPE_OPTIONS: Option<DebtQuery["type"]>[] = [
   { value: "i_owe", label: DEBT_TYPE_LABELS.i_owe },
 ];
 
+const SORT_OPTIONS: Option<SortOption>[] = [
+  { value: "newest", label: "Terbaru" },
+  { value: "oldest", label: "Terlama" },
+  { value: "amount_desc", label: "Jumlah terbesar" },
+  { value: "amount_asc", label: "Jumlah terkecil" },
+];
+
 type DebtFiltersProps = {
-  value: DebtQuery;
-  onChange: (filters: DebtQuery) => void;
+  filters: DebtQuery;
+  onFiltersChange: (filters: DebtQuery) => void;
+  search: string;
+  onSearchChange: (search: string) => void;
+  sort: SortOption;
+  onSortChange: (sort: SortOption) => void;
 };
 
-export function DebtFilters({ value, onChange }: DebtFiltersProps) {
+export function DebtFilters({
+  filters,
+  onFiltersChange,
+  search,
+  onSearchChange,
+  sort,
+  onSortChange,
+}: DebtFiltersProps) {
   return (
-    <div className="grid grid-cols-2 gap-3">
-      <FilterSelect
-        label="Status"
-        options={STATUS_OPTIONS}
-        value={value.status}
-        onChange={(status) => onChange({ ...value, status })}
-      />
-      <FilterSelect
-        label="Tipe"
-        options={TYPE_OPTIONS}
-        value={value.type}
-        onChange={(type) => onChange({ ...value, type })}
-      />
+    <div className="flex flex-col gap-3">
+      <div className="relative">
+        <label htmlFor="debt-search" className="sr-only">
+          Cari nama orang
+        </label>
+        <Search
+          className="pointer-events-none absolute left-3.5 top-1/2 size-5 -translate-y-1/2 text-stone-400"
+          aria-hidden
+        />
+        <input
+          id="debt-search"
+          type="search"
+          enterKeyHint="search"
+          autoComplete="off"
+          placeholder="Cari nama orang..."
+          value={search}
+          onChange={(event) => onSearchChange(event.target.value)}
+          // 16px on mobile so iOS Safari doesn't zoom in on focus.
+          className="h-11 w-full rounded-xl border border-stone-200 bg-white pl-11 pr-11 text-base text-stone-900 shadow-sm outline-none transition placeholder:text-stone-400 hover:border-stone-300 focus:border-emerald-600 focus:ring-4 focus:ring-emerald-600/15 sm:text-sm [&::-webkit-search-cancel-button]:appearance-none"
+        />
+        {search && (
+          <button
+            type="button"
+            onClick={() => onSearchChange("")}
+            aria-label="Hapus pencarian"
+            className="absolute right-0 top-0 grid size-11 place-items-center rounded-xl text-stone-400 transition hover:text-stone-700 active:scale-95"
+          >
+            <X className="size-4" aria-hidden />
+          </button>
+        )}
+      </div>
+
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+        <FilterSelect
+          label="Status"
+          options={STATUS_OPTIONS}
+          value={filters.status}
+          onChange={(status) => onFiltersChange({ ...filters, status })}
+        />
+        <FilterSelect
+          label="Tipe"
+          options={TYPE_OPTIONS}
+          value={filters.type}
+          onChange={(type) => onFiltersChange({ ...filters, type })}
+        />
+        <FilterSelect
+          label="Urutkan"
+          options={SORT_OPTIONS}
+          value={sort}
+          onChange={onSortChange}
+          className="col-span-2 sm:col-span-1"
+        />
+      </div>
     </div>
   );
 }
@@ -47,11 +106,18 @@ type FilterSelectProps<T extends string> = {
   options: Option<T>[];
   value: T;
   onChange: (value: T) => void;
+  className?: string;
 };
 
-function FilterSelect<T extends string>({ label, options, value, onChange }: FilterSelectProps<T>) {
+function FilterSelect<T extends string>({
+  label,
+  options,
+  value,
+  onChange,
+  className = "",
+}: FilterSelectProps<T>) {
   return (
-    <label className="flex flex-col gap-1">
+    <label className={`flex min-w-0 flex-col gap-1 ${className}`}>
       <span className="text-xs font-medium text-stone-500">{label}</span>
       <span className="relative">
         <select
@@ -60,7 +126,7 @@ function FilterSelect<T extends string>({ label, options, value, onChange }: Fil
             const option = options.find((o) => o.value === event.target.value);
             if (option) onChange(option.value);
           }}
-          className="h-11 w-full cursor-pointer appearance-none rounded-xl border border-stone-200 bg-white pl-3 pr-9 text-sm font-medium text-stone-800 shadow-sm outline-none transition hover:border-stone-300 focus:border-emerald-600 focus:ring-4 focus:ring-emerald-600/15"
+          className="h-11 w-full cursor-pointer appearance-none truncate rounded-xl border border-stone-200 bg-white pl-3 pr-8 text-base font-medium text-stone-800 shadow-sm outline-none transition hover:border-stone-300 focus:border-emerald-600 focus:ring-4 focus:ring-emerald-600/15 sm:text-sm"
         >
           {options.map((option) => (
             <option key={option.value} value={option.value}>
@@ -69,7 +135,7 @@ function FilterSelect<T extends string>({ label, options, value, onChange }: Fil
           ))}
         </select>
         <ChevronDown
-          className="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-stone-400"
+          className="pointer-events-none absolute right-2.5 top-1/2 size-4 -translate-y-1/2 text-stone-400"
           aria-hidden
         />
       </span>

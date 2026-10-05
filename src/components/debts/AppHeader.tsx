@@ -13,7 +13,7 @@ export function AppHeader({ email }: { email: string | undefined }) {
               type="submit"
               aria-label="Keluar"
               title="Keluar"
-              className="grid size-10 place-items-center rounded-full text-stone-600 transition hover:bg-stone-100 hover:text-stone-900 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-emerald-600/30 active:scale-95"
+              className="grid size-11 shrink-0 place-items-center rounded-full text-stone-600 transition hover:bg-stone-100 hover:text-stone-900 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-emerald-600/30 active:scale-95"
             >
               <LogOut className="size-5" aria-hidden />
             </button>

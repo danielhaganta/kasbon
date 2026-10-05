@@ -1,6 +1,7 @@
 import { ArrowDownLeft, ArrowUpRight, Info, type LucideIcon } from "lucide-react";
 import type { DebtSummary } from "@/hooks/useDebts";
 import { formatRupiah } from "@/lib/format";
+import { DebtBarChart } from "./DebtBarChart";
 
 const NET_TONES = {
   positive: { card: "bg-emerald-700 text-white", hint: "text-emerald-100", text: "Kamu lebih banyak dihutangin" },
@@ -26,6 +27,9 @@ export function SummaryCards({ summary }: { summary: DebtSummary }) {
         </div>
         <StatCard label="Total dihutang ke saya" amount={owedToMe} icon={ArrowDownLeft} />
         <StatCard label="Total saya hutang" amount={iOwe} icon={ArrowUpRight} />
+        <div className="col-span-2 sm:col-span-3">
+          <DebtBarChart owedToMe={owedToMe} iOwe={iOwe} />
+        </div>
       </div>
       <p className="mt-3 flex items-center gap-1.5 text-xs text-stone-500">
         <Info className="size-3.5 shrink-0" aria-hidden />

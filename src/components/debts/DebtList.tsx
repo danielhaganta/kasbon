@@ -2,10 +2,14 @@
 
 import { Inbox, Plus, SearchX } from "lucide-react";
 import type { Debt } from "@/hooks/useDebts";
+import { groupByPerson } from "@/lib/debts";
+import { DebtGroupList } from "./DebtGroupList";
 import { DebtItem, type DebtAction } from "./DebtItem";
+import type { DebtView } from "./ViewToggle";
 
 type DebtListProps = {
   debts: Debt[];
+  view: DebtView;
   isLoading: boolean;
   isFiltered: boolean;
   pendingIds: ReadonlySet<string>;
@@ -19,6 +23,7 @@ type DebtListProps = {
 
 export function DebtList({
   debts,
+  view,
   isLoading,
   isFiltered,
   pendingIds,
@@ -50,21 +55,23 @@ export function DebtList({
     );
   }
 
-  return (
-    <ul className="flex flex-col gap-3">
-      {debts.map((debt) => (
-        <DebtItem
-          key={debt.id}
-          debt={debt}
-          isBusy={pendingIds.has(debt.id)}
-          busyAction={busyActions[debt.id]}
-          onToggleSettled={onToggleSettled}
-          onEdit={onEdit}
-          onDelete={onDelete}
-        />
-      ))}
-    </ul>
+  const renderItem = (debt: Debt) => (
+    <DebtItem
+      key={debt.id}
+      debt={debt}
+      isBusy={pendingIds.has(debt.id)}
+      busyAction={busyActions[debt.id]}
+      onToggleSettled={onToggleSettled}
+      onEdit={onEdit}
+      onDelete={onDelete}
+    />
   );
+
+  if (view === "person") {
+    return <DebtGroupList groups={groupByPerson(debts)} renderItem={renderItem} />;
+  }
+
+  return <ul className="flex flex-col gap-3">{debts.map(renderItem)}</ul>;
 }
 
 type EmptyStateProps = {
@@ -85,7 +92,7 @@ function EmptyState({ icon, message, actionLabel, actionIcon, onAction }: EmptyS
       <button
         type="button"
         onClick={onAction}
-        className="mt-5 inline-flex h-10 items-center gap-1.5 rounded-xl bg-stone-900 px-4 text-sm font-semibold text-white transition hover:bg-stone-800 active:scale-[0.97]"
+        className="mt-5 inline-flex h-11 items-center gap-1.5 rounded-xl bg-stone-900 px-4 text-sm font-semibold text-white transition hover:bg-stone-800 active:scale-[0.97]"
       >
         {actionIcon}
         {actionLabel}
@@ -108,9 +115,9 @@ function DebtListSkeleton() {
           </div>
           <div className="mt-4 h-3.5 w-36 rounded bg-stone-100" />
           <div className="mt-4 flex gap-2 border-t border-stone-100 pt-3">
-            <div className="h-10 flex-1 rounded-xl bg-stone-100" />
-            <div className="h-10 flex-1 rounded-xl bg-stone-100" />
-            <div className="h-10 flex-1 rounded-xl bg-stone-100" />
+            <div className="h-11 flex-1 rounded-xl bg-stone-100" />
+            <div className="h-11 flex-1 rounded-xl bg-stone-100" />
+            <div className="h-11 flex-1 rounded-xl bg-stone-100" />
           </div>
         </li>
       ))}

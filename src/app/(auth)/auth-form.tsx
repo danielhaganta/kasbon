@@ -99,7 +99,7 @@ export function AuthForm({ mode }: { mode: keyof typeof MODES }) {
         {config.switchText}{" "}
         <Link
           href={config.switchHref}
-          className="font-semibold text-emerald-700 underline-offset-4 hover:underline"
+          className="inline-flex min-h-11 items-center px-1 font-semibold text-emerald-700 underline-offset-4 hover:underline"
         >
           {config.switchLabel}
         </Link>
